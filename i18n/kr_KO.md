@@ -16,7 +16,7 @@ Never work in a vacuum. I find that the Angular community is an incredible group
 Many of my styles have been from the many pair programming sessions [Ward Bell](http://twitter.com/wardbell) and I have had. My friend Ward has certainly helped influence the ultimate evolution of this guide.
 
 ## See the Styles in a Sample App
-While this guide explains the *what*, *why* and *how*, I find it helpful to see them in practice. This guide is accompanied by a sample application that follows these styles and patterns. You can find the [sample application (named modular) here](https://github.com/johnpapa/ng-demos) in the `modular` folder. Feel free to grab it, clone it, or fork it. [Instructions on running it are in its readme](https://github.com/johnpapa/ng-demos/tree/master/modular).
+While this guide explains the *what*, *이유는* and *how*, I find it helpful to see them in practice. This guide is accompanied by a sample application that follows these styles and patterns. You can find the [sample application (named modular) here](https://github.com/johnpapa/ng-demos) in the `modular` folder. Feel free to grab it, clone it, or fork it. [Instructions on running it are in its readme](https://github.com/johnpapa/ng-demos/tree/master/modular).
 
 ##Translations
 [Translations of this Angular style guide](https://github.com/johnpapa/angular-styleguide/tree/master/i18n) are maintained by the community and can be found here.
@@ -56,17 +56,18 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   1. [Contributing](#contributing)
   1. [License](#license)
 
-## Single Responsibility
+## 단일 책임 원칙
 
-### Rule of 1
+### 규칙 1
 ###### [Style [Y001](#style-y001)]
 
-  - Define 1 component per file.
+  - 파일당 하나의 컴퍼넌트만 정의하라. Define 1 component per file.
 
   The following example defines the `app` module and its dependencies, defines a controller, and defines a factory all in the same file.
+  다음의 예제는 'app' 모듈과 의존성, 컨트롤러, 팩토리를 한번에 정의한다.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   angular
       .module('app', ['ngRoute'])
       .controller('SomeController', SomeController)
@@ -77,10 +78,10 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   function someFactory() { }
   ```
 
-  The same components are now separated into their own files.
+  같은 컴퍼넌트를 각각의 파일로 분리하면 이렇게 된다.
 
   ```javascript
-  /* recommended */
+  /* 추천 */
 
   // app.module.js
   angular
@@ -88,7 +89,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
 
   // someController.js
   angular
@@ -99,7 +100,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
 
   // someFactory.js
   angular
@@ -111,24 +112,29 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
 **[Back to top](#table-of-contents)**
 
-## IIFE
-### JavaScript Closures
+## 즉시실행함수 (IIFE)
+### 자바스크립트 클로저 (JavaScript Closures)
 ###### [Style [Y010](#style-y010)]
 
   - Wrap Angular components in an Immediately Invoked Function Expression (IIFE).
+  - 앵귤러 컴포넌트들을 즉시실행 함수로 감싸라.
 
-  *Why?*: An IIFE removes variables from the global scope. This helps prevent variables and function declarations from living longer than expected in the global scope, which also helps avoid variable collisions.
-
-  *Why?*: When your code is minified and bundled into a single file for deployment to a production server, you could have collisions of variables and many global variables. An IIFE protects you against both of these by providing variable scope for each file.
+  *이유는?*: An IIFE removes variables from the global scope. This helps prevent variables and function declarations from living longer than expected in the global scope, 
+  which also helps avoid variable collisions.
+    즉시실행 함수로 글로벌 스코프 변수 선언을 방지 할 수 있다. 이는 글로벌 스코프에 선언된 변수나 함수가 필요 이상으로 오래 남아있는 경우를 방지하며, 변수의 중복으로 인한 충돌도 피할 수 있다.
+  *이유는?*: 
+  When your code is minified and bundled into a single file for deployment to a production server, 
+  you could have collisions of variables and many global variables. An IIFE protects you against both of these by providing variable scope for each file.
+    코드가 압축되어(minified) 하나의 파일로 제공되어 제품화 단계의 서버에 배포되었을때, 지역변수들과 글로벌 변수들간의 충돌이 생길 수 있다. 즉시실행 함수는 각각의 파일에 변수 스코프를 제공하여 이를 방지한다.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   // logger.js
   angular
       .module('app')
       .factory('logger', logger);
 
-  // logger function is added as a global variable
+  // logger 함수가 글로벌 변수로 추가됨.
   function logger() { }
 
   // storage.js
@@ -137,14 +143,15 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
       .factory('storage', storage);
 
   // storage function is added as a global variable
+  // storage 함수가 글로벌 변수로 추가됨.
   function storage() { }
   ```
 
   ```javascript
   /**
-   * recommended
+   * 추천
    *
-   * no globals are left behind
+   * 글로벌 변수가 하나도 추가되지 않음.
    */
 
   // logger.js
@@ -170,30 +177,37 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   })();
   ```
 
-  - Note: For brevity only, the rest of the examples in this guide may omit the IIFE syntax.
-
-  - Note: IIFE's prevent test code from reaching private members like regular expressions or helper functions which are often good to unit test directly on their own. However you can test these through accessible members or by exposing them through their own component. For example placing helper functions, regular expressions or constants in their own factory or constant.
+  - 참고 : 간결함을 위해서, 이하의 예제들에서는 즉시 실행 함수가 빠져있을 수 있다.
+  - 참고 : 즉시 실행 함수는 테스트 코드가 정규표현식이나 helper 함수같은 private 멤버에 접근하는 것을 막는다. 보통은 이들을 위해서 각각의 단위 테스트를 따로 만들어 주는 것이 좋다.
+  그러나 접근가능한 멤버를 만들거나 컴퍼넌트 자체에서 노출시켜 테스트 할 수도 있다. 예를들면 helper 함수, 정규표현식, 상수를 테스트 대상 팩토리나 상수에 추가하는 방법이 있다.
 
 **[Back to top](#table-of-contents)**
 
-## Modules
+## 모듈 Modules
 
-### Avoid Naming Collisions
+### 중복 이름 회피 Avoid Naming Collisions
 ###### [Style [Y020](#style-y020)]
 
   - Use unique naming conventions with separators for sub-modules.
+  - 서브 모듈의 이름은 구분자를 이용해 중복되지 않도록 하라.
 
-  *Why?*: Unique names help avoid module name collisions. Separators help define modules and their submodule hierarchy. For example `app` may be your root module while `app.dashboard` and `app.users` may be modules that are used as dependencies of `app`.
+  *이유는?*: Unique names help avoid module name collisions. 
+  Separators help define modules and their submodule hierarchy. 
+  For example `app` may be your root module while `app.dashboard` and `app.users` may be modules that are used as dependencies of `app`.
+  모듈 이름이 중복되어 발생하는 충돌을 피할 수 있다. 구분자를 이용하면 모듈과 서브모듈의 계층구조를 알아보는데 도움이 된다. 
+  예를들면 구분자 없는 `app`은 루트 모듈이라 생각될 것이고 `app.dashboard`이나 `app.users`는 `app`에 의존성을 갖는 모듈로 쉽게 이해될 것이다.
 
-### Definitions (aka Setters)
+### 정의 (일명 Setters) Definitions (aka Setters)
 ###### [Style [Y021](#style-y021)]
 
   - Declare modules without a variable using the setter syntax.
+  - 모듈은 setter 문법을 이용하여 선언하고 변수에 할당하지 않는다.
 
-  *Why?*: With 1 component per file, there is rarely a need to introduce a variable for the module.
+  *이유는?*: With 1 component per file, there is rarely a need to introduce a variable for the module.
+  하나의 파일당 하나의 컴포넌트를 할당하면 변수를 호출할 경우가 매우 드물기 때문이다.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   var app = angular.module('app', [
       'ngAnimate',
       'ngRoute',
@@ -202,10 +216,10 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ]);
   ```
 
-  Instead use the simple setter syntax.
+  위와 같은 방법 대신에 간단한 setter 문법을 사용하라.
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   angular
       .module('app', [
           'ngAnimate',
@@ -219,11 +233,13 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 ###### [Style [Y022](#style-y022)]
 
   - When using a module, avoid using a variable and instead use chaining with the getter syntax.
+  - 모듈을 사용할때 변수로 호출하여 사용하지말고 getter 문법의 chaining을 이용하라.
 
-  *Why?*: This produces more readable code and avoids variable collisions or leaks.
+  *이유는?*: This produces more readable code and avoids variable collisions or leaks.
+  가독성을 높이고 변수의 충돌과 누수를 피할 수 있다.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   var app = angular.module('app');
   app.controller('SomeController', SomeController);
 
@@ -231,7 +247,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   angular
       .module('app')
       .controller('SomeController', SomeController);
@@ -243,11 +259,13 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 ###### [Style [Y023](#style-y023)]
 
   - Only set once and get for all other instances.
+  - 모듈은 한번 set하고 다른 모든 인스턴스에서 get하여 사용한다.
 
-  *Why?*: A module should only be created once, then retrieved from that point and after.
+  *이유는?*: A module should only be created once, then retrieved from that point and after.
+  모듈은 한번만 생성하고 그 시점부터는 만들어진 것을 재사용해야 하기 때문이다.
 
   ```javascript
-  /* recommended */
+  /* 추천 */
 
   // to set a module
   angular.module('app', []);
@@ -260,11 +278,13 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 ###### [Style [Y024](#style-y024)]
 
   - Use named functions instead of passing an anonymous function in as a callback.
+  - 콜백에 익명 함수 대신 이름 있는 함수를 사용하라.
 
-  *Why?*: This produces more readable code, is much easier to debug, and reduces the amount of nested callback code.
+  *이유는?*: This produces more readable code, is much easier to debug, and reduces the amount of nested callback code.
+  가독성을 높이고 디버그가 쉬우며 중첩되는 콜백을 줄일 수 있다.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   angular
       .module('app')
       .controller('Dashboard', function() { })
@@ -272,7 +292,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
 
   // dashboard.js
   angular
@@ -295,16 +315,17 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
 ## Controllers
 
-### controllerAs View Syntax
+### controllerAs 뷰 문법 controllerAs View Syntax
 ###### [Style [Y030](#style-y030)]
 
-  - Use the [`controllerAs`](http://www.johnpapa.net/do-you-like-your-angular-controllers-with-or-without-sugar/) syntax over the `classic controller with $scope` syntax.
+  - `기존의 $scope를 이용한 컨트롤러 문법` 대신에 [`controllerAs`](http://www.johnpapa.net/do-you-like-your-angular-controllers-with-or-without-sugar/)문법을 사용하라. 
+  
+  *이유는?*: 컨트롤러는 생성되고 초기화되며 새로운 하나의 인스턴스를 제공하기 때문이다. 또한 'controllerAs' 문법은 `기존의 $scope 문법`보다 더 자바스크립트 생성자 문법과 비슷하다.
 
-  *Why?*: Controllers are constructed, "newed" up, and provide a single new instance, and the `controllerAs` syntax is closer to that of a JavaScript constructor than the `classic $scope syntax`.
+  *이유는?*: controllerAs 문법을 사용하면 뷰에서 바인딩을 할때 자연스럽게 마침표(.)를 포함한 객체를 사용하게 되기 때문이다. (예를들면 `name`대신 `customer.name`을 사용하게 된다)
+  따라서 문맥이 자연스러워지고 가독성이 높아지며, 마침표(.) 없는 객체를 참조할 때 생기는 모든 이슈를 피할 수 있다.
 
-  *Why?*: It promotes the use of binding to a "dotted" object in the View (e.g. `customer.name` instead of `name`), which is more contextual, easier to read, and avoids any reference issues that may occur without "dotting".
-
-  *Why?*: Helps avoid using `$parent` calls in Views with nested controllers.
+  *이유는?*: 컨트롤러들이 중첩된 뷰에서 `$parent`를 호출하는 것을 피할 수 있다.
 
   ```html
   <!-- avoid -->
@@ -320,19 +341,21 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   </div>
   ```
 
-### controllerAs Controller Syntax
+### controllerAs 컨트롤러 문법 controllerAs Controller Syntax
 ###### [Style [Y031](#style-y031)]
 
-  - Use the `controllerAs` syntax over the `classic controller with $scope` syntax.
+  - `기존의 $scope를 이용한 컨트롤러`문법 대신에 `controllerAs`문법을 사용하라.
 
   - The `controllerAs` syntax uses `this` inside controllers which gets bound to `$scope`
+  `controllerAs` 문법은 스코프에 바인딩되는 컨트롤러 내부에서 `this`를 사용한다.
 
-  *Why?*: `controllerAs` is syntactic sugar over `$scope`. You can still bind to the View and still access `$scope` methods.
+  *이유는?*: `controllerAs` is syntactic sugar over `$scope`. You can still bind to the View and still access `$scope` methods.
+  `$scope`에 `controllerAs`는 꿀문법(syntactic sugar)이기 때문이다. 이를 이용하면서도 `$scope`를 뷰에 바인딩하거나 `$scope` 메서드에 접근하는 것엔 문제가 없다.
 
-  *Why?*: Helps avoid the temptation of using `$scope` methods inside a controller when it may otherwise be better to avoid them or move them to a factory. Consider using `$scope` in a factory, or if in a controller just when needed. For example when publishing and subscribing events using [`$emit`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$emit), [`$broadcast`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$broadcast), or [`$on`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$on) consider moving these uses to a factory and invoke from the controller.
+  *이유는?*: 컨트롤러 내부에서 `$scope` 메서드를 사용하는 것을 피하거나 팩토리로 옮기는 것이 나을때, `$scope` 메서드를 사용하고 싶은 유혹을 뿌리치는데 도움이 된다. `$scope`는 팩토리에서 사용하고 컨트롤러에서는 꼭 필요한 때에만 사용하는 것을 고려해보라. 예를들면 [`$emit`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$emit), [`$broadcast`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$broadcast), or [`$on`](https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$on) 같은 메서드를 이용하여 이벤트를 발행하거나 받는 부분을 설정하였다면, 이들을 팩토리로 옮기고 컨트롤러에서 부르는 방법을 고려해보라.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   function Customer($scope) {
       $scope.name = {};
       $scope.sendMessage = function() { };
@@ -340,22 +363,24 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended - but see next section */
+  /* 추천 - but see next section */
   function Customer() {
       this.name = {};
       this.sendMessage = function() { };
   }
   ```
 
-### controllerAs with vm
+### controllerAs 와 vm controllerAs with vm
 ###### [Style [Y032](#style-y032)]
 
   - Use a capture variable for `this` when using the `controllerAs` syntax. Choose a consistent variable name such as `vm`, which stands for ViewModel.
+  - `controllerAs` 문법을 이용할 때 `this`를 위한 캡쳐 변수를 사용하라. 뷰 모델(ViewModel)의 앞자를 딴 `vm` 처럼 일관된 변수 이름을 정하라.
 
-  *Why?*: The `this` keyword is contextual and when used within a function inside a controller may change its context. Capturing the context of `this` avoids encountering this problem.
+  *이유는?*: The `this` keyword is contextual and when used within a function inside a controller may change its context. Capturing the context of `this` avoids encountering this problem.
+  `this`는 문맥에 따라 변하며 컨트롤러 내부의 함수에서 사용할 경우 문맥상 의미가 변할 수 있다. `this`를 캡쳐해두면 이러한 문제를 피할 수 있다.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   function Customer() {
       this.name = {};
       this.sendMessage = function() { };
@@ -363,7 +388,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   function Customer() {
       var vm = this;
       vm.name = {};
@@ -371,15 +396,14 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   }
   ```
 
-  Note: You can avoid any [jshint](http://www.jshint.com/) warnings by placing the comment above the line of code. However it is not needed when the function is named using UpperCasing, as this convention means it is a constructor function, which is what a controller is in Angular.
-
+  Note: 코드 위에 주석을 달아서 [jshint](http://www.jshint.com/)의 경고를 피할 수 있다. 하지만 Angular의 컨트롤러 처럼 UpperCasing으로 이름 붙여진 함수들은 생성자 함수인데, 이들에겐 주석이 불필요하다.
   ```javascript
   /* jshint validthis: true */
   var vm = this;
   ```
 
-  Note: When creating watches in a controller using `controller as`, you can watch the `vm.*` member using the following syntax. (Create watches with caution as they add more load to the digest cycle.)
-
+  Note: 
+  `controllerAs` 문법을 사용하는 컨트롤러에서 watch를 생성할때 `vm.*`멤버를 사용하여  watch할 수 있다. (watch는 다이제스트 사이클에 부하를 가중시키므로 주의깊게 사용하여야 한다.) 
   ```html
   <input ng-model="vm.title"/>
   ```
@@ -401,12 +425,12 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Place bindable members at the top of the controller, alphabetized, and not spread through the controller code.
 
-    *Why?*: Placing bindable members at the top makes it easy to read and helps you instantly identify which members of the controller can be bound and used in the View.
+    *이유는?*: Placing bindable members at the top makes it easy to read and helps you instantly identify which members of the controller can be bound and used in the View.
 
-    *Why?*: Setting anonymous functions in-line can be easy, but when those functions are more than 1 line of code they can reduce the readability. Defining the functions below the bindable members (the functions will be hoisted) moves the implementation details down, keeps the bindable members up top, and makes it easier to read.
+    *이유는?*: Setting anonymous functions in-line can be easy, but when those functions are more than 1 line of code they can reduce the readability. Defining the functions below the bindable members (the functions will be hoisted) moves the implementation details down, keeps the bindable members up top, and makes it easier to read.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   function Sessions() {
       var vm = this;
 
@@ -424,7 +448,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   function Sessions() {
       var vm = this;
 
@@ -454,7 +478,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   Note: If the function is a 1 liner consider keeping it right up top, as long as readability is not affected.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   function Sessions(data) {
       var vm = this;
 
@@ -474,7 +498,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   function Sessions(sessionDataService) {
       var vm = this;
 
@@ -490,15 +514,15 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use function declarations to hide implementation details. Keep your bindable members up top. When you need to bind a function in a controller, point it to a function declaration that appears later in the file. This is tied directly to the section Bindable Members Up Top. For more details see [this post](http://www.johnpapa.net/angular-function-declarations-function-expressions-and-readable-code).
 
-    *Why?*: Placing bindable members at the top makes it easy to read and helps you instantly identify which members of the controller can be bound and used in the View. (Same as above.)
+    *이유는?*: Placing bindable members at the top makes it easy to read and helps you instantly identify which members of the controller can be bound and used in the View. (Same as above.)
 
-    *Why?*: Placing the implementation details of a function later in the file moves that complexity out of view so you can see the important stuff up top.
+    *이유는?*: Placing the implementation details of a function later in the file moves that complexity out of view so you can see the important stuff up top.
 
-    *Why?*: Function declaration are hoisted so there are no concerns over using a function before it is defined (as there would be with function expressions).
+    *이유는?*: Function declaration are hoisted so there are no concerns over using a function before it is defined (as there would be with function expressions).
 
-    *Why?*: You never have to worry with function declarations that moving `var a` before `var b` will break your code because `a` depends on `b`.
+    *이유는?*: You never have to worry with function declarations that moving `var a` before `var b` will break your code because `a` depends on `b`.
 
-    *Why?*: Order is critical with function expressions
+    *이유는?*: Order is critical with function expressions
 
   ```javascript
   /**
@@ -565,17 +589,17 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Defer logic in a controller by delegating to services and factories.
 
-    *Why?*: Logic may be reused by multiple controllers when placed within a service and exposed via a function.
+    *이유는?*: Logic may be reused by multiple controllers when placed within a service and exposed via a function.
 
-    *Why?*: Logic in a service can more easily be isolated in a unit test, while the calling logic in the controller can be easily mocked.
+    *이유는?*: Logic in a service can more easily be isolated in a unit test, while the calling logic in the controller can be easily mocked.
 
-    *Why?*: Removes dependencies and hides implementation details from the controller.
+    *이유는?*: Removes dependencies and hides implementation details from the controller.
 
-    *Why?*: Keeps the controller slim, trim, and focused.
+    *이유는?*: Keeps the controller slim, trim, and focused.
 
   ```javascript
 
-  /* avoid */
+  /* 비추천 */
   function Order($http, $q, config, userInfo) {
       var vm = this;
       vm.checkCredit = checkCredit;
@@ -605,7 +629,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   function Order(creditService) {
       var vm = this;
       vm.checkCredit = checkCredit;
@@ -625,7 +649,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Define a controller for a view, and try not to reuse the controller for other views. Instead, move reusable logic to factories and keep the controller simple and focused on its view.
 
-    *Why?*: Reusing controllers with several views is brittle and good end-to-end (e2e) test coverage is required to ensure stability across large applications.
+    *이유는?*: Reusing controllers with several views is brittle and good end-to-end (e2e) test coverage is required to ensure stability across large applications.
 
 ### Assigning Controllers
 ###### [Style [Y038](#style-y038)]
@@ -634,10 +658,10 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
     Note: If a View is loaded via another means besides a route, then use the `ng-controller="Avengers as vm"` syntax.
 
-    *Why?*: Pairing the controller in the route allows different routes to invoke different pairs of controllers and views. When controllers are assigned in the view using [`ng-controller`](https://docs.angularjs.org/api/ng/directive/ngController), that view is always associated with the same controller.
+    *이유는?*: Pairing the controller in the route allows different routes to invoke different pairs of controllers and views. When controllers are assigned in the view using [`ng-controller`](https://docs.angularjs.org/api/ng/directive/ngController), that view is always associated with the same controller.
 
  ```javascript
-  /* avoid - when using with a route and dynamic pairing is desired */
+  /* 비추천 - when using with a route and dynamic pairing is desired */
 
   // route-config.js
   angular
@@ -659,7 +683,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
 
   // route-config.js
   angular
@@ -742,14 +766,14 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Expose the callable members of the service (its interface) at the top, using a technique derived from the [Revealing Module Pattern](http://addyosmani.com/resources/essentialjsdesignpatterns/book/#revealingmodulepatternjavascript).
 
-    *Why?*: Placing the callable members at the top makes it easy to read and helps you instantly identify which members of the service can be called and must be unit tested (and/or mocked).
+    *이유는?*: Placing the callable members at the top makes it easy to read and helps you instantly identify which members of the service can be called and must be unit tested (and/or mocked).
 
-    *Why?*: This is especially helpful when the file gets longer as it helps avoid the need to scroll to see what is exposed.
+    *이유는?*: This is especially helpful when the file gets longer as it helps avoid the need to scroll to see what is exposed.
 
-    *Why?*: Setting functions as you go can be easy, but when those functions are more than 1 line of code they can reduce the readability and cause more scrolling. Defining the callable interface via the returned service moves the implementation details down, keeps the callable interface up top, and makes it easier to read.
+    *이유는?*: Setting functions as you go can be easy, but when those functions are more than 1 line of code they can reduce the readability and cause more scrolling. Defining the callable interface via the returned service moves the implementation details down, keeps the callable interface up top, and makes it easier to read.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   function dataService() {
     var someValue = '';
     function save() {
@@ -768,7 +792,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   function dataService() {
       var someValue = '';
       var service = {
@@ -799,15 +823,15 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use function declarations to hide implementation details. Keep your accessible members of the factory up top. Point those to function declarations that appears later in the file. For more details see [this post](http://www.johnpapa.net/angular-function-declarations-function-expressions-and-readable-code).
 
-    *Why?*: Placing accessible members at the top makes it easy to read and helps you instantly identify which functions of the factory you can access externally.
+    *이유는?*: Placing accessible members at the top makes it easy to read and helps you instantly identify which functions of the factory you can access externally.
 
-    *Why?*: Placing the implementation details of a function later in the file moves that complexity out of view so you can see the important stuff up top.
+    *이유는?*: Placing the implementation details of a function later in the file moves that complexity out of view so you can see the important stuff up top.
 
-    *Why?*: Function declaration are hoisted so there are no concerns over using a function before it is defined (as there would be with function expressions).
+    *이유는?*: Function declaration are hoisted so there are no concerns over using a function before it is defined (as there would be with function expressions).
 
-    *Why?*: You never have to worry with function declarations that moving `var a` before `var b` will break your code because `a` depends on `b`.
+    *이유는?*: You never have to worry with function declarations that moving `var a` before `var b` will break your code because `a` depends on `b`.
 
-    *Why?*: Order is critical with function expressions
+    *이유는?*: Order is critical with function expressions
 
   ```javascript
   /**
@@ -901,14 +925,14 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Refactor logic for making data operations and interacting with data to a factory. Make data services responsible for XHR calls, local storage, stashing in memory, or any other data operations.
 
-    *Why?*: The controller's responsibility is for the presentation and gathering of information for the view. It should not care how it gets the data, just that it knows who to ask for it. Separating the data services moves the logic on how to get it to the data service, and lets the controller be simpler and more focused on the view.
+    *이유는?*: The controller's responsibility is for the presentation and gathering of information for the view. It should not care how it gets the data, just that it knows who to ask for it. Separating the data services moves the logic on how to get it to the data service, and lets the controller be simpler and more focused on the view.
 
-    *Why?*: This makes it easier to test (mock or real) the data calls when testing a controller that uses a data service.
+    *이유는?*: This makes it easier to test (mock or real) the data calls when testing a controller that uses a data service.
 
-    *Why?*: Data service implementation may have very specific code to handle the data repository. This may include headers, how to talk to the data, or other services such as `$http`. Separating the logic into a data service encapsulates this logic in a single place hiding the implementation from the outside consumers (perhaps a controller), also making it easier to change the implementation.
+    *이유는?*: Data service implementation may have very specific code to handle the data repository. This may include headers, how to talk to the data, or other services such as `$http`. Separating the logic into a data service encapsulates this logic in a single place hiding the implementation from the outside consumers (perhaps a controller), also making it easier to change the implementation.
 
   ```javascript
-  /* recommended */
+  /* 추천 */
 
   // dataservice factory
   angular
@@ -941,7 +965,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
     Note: The data service is called from consumers, such as a controller, hiding the implementation from the consumers, as shown below.
 
   ```javascript
-  /* recommended */
+  /* 추천 */
 
   // controller calling the dataservice factory
   angular
@@ -977,10 +1001,10 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - When calling a data service that returns a promise such as `$http`, return a promise in your calling function too.
 
-    *Why?*: You can chain the promises together and take further action after the data call completes and resolves or rejects the promise.
+    *이유는?*: You can chain the promises together and take further action after the data call completes and resolves or rejects the promise.
 
   ```javascript
-  /* recommended */
+  /* 추천 */
 
   activate();
 
@@ -1025,14 +1049,14 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Create one directive per file. Name the file for the directive.
 
-    *Why?*: It is easy to mash all the directives in one file, but difficult to then break those out so some are shared across apps, some across modules, some just for one module.
+    *이유는?*: It is easy to mash all the directives in one file, but difficult to then break those out so some are shared across apps, some across modules, some just for one module.
 
-    *Why?*: One directive per file is easy to maintain.
+    *이유는?*: One directive per file is easy to maintain.
 
     > Note: "**Best Practice**: Directives should clean up after themselves. You can use `element.on('$destroy', ...)` or `scope.$on('$destroy', ...)` to run a clean-up function when the directive is removed" ... from the Angular documentation.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   /* directives.js */
 
   angular
@@ -1061,7 +1085,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   /* calendarRange.directive.js */
 
   /**
@@ -1078,7 +1102,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   /* customerInfo.directive.js */
 
   /**
@@ -1095,7 +1119,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   /* spinner.directive.js */
 
   /**
@@ -1118,14 +1142,14 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - When manipulating the DOM directly, use a directive. If alternative ways can be used such as using CSS to set styles or the [animation services](https://docs.angularjs.org/api/ngAnimate), Angular templating, [`ngShow`](https://docs.angularjs.org/api/ng/directive/ngShow) or [`ngHide`](https://docs.angularjs.org/api/ng/directive/ngHide), then use those instead. For example, if the directive simply hides and shows, use ngHide/ngShow.
 
-    *Why?*: DOM manipulation can be difficult to test, debug, and there are often better ways (e.g. CSS, animations, templates)
+    *이유는?*: DOM manipulation can be difficult to test, debug, and there are often better ways (e.g. CSS, animations, templates)
 
 ### Provide a Unique Directive Prefix
 ###### [Style [Y073](#style-y073)]
 
   - Provide a short, unique and descriptive directive prefix such as `acmeSalesCustomerInfo` which would be declared in HTML as `acme-sales-customer-info`.
 
-    *Why?*: The unique short prefix identifies the directive's context and origin. For example a prefix of `cc-` may indicate that the directive is part of a CodeCamper app while `acme-` may indicate a directive for the Acme company.
+    *이유는?*: The unique short prefix identifies the directive's context and origin. For example a prefix of `cc-` may indicate that the directive is part of a CodeCamper app while `acme-` may indicate a directive for the Acme company.
 
     Note: Avoid `ng-` as these are reserved for Angular directives. Research widely used directives to avoid naming conflicts, such as `ion-` for the [Ionic Framework](http://ionicframework.com/).
 
@@ -1134,9 +1158,9 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - When creating a directive that makes sense as a stand-alone element, allow restrict `E` (custom element) and optionally restrict `A` (custom attribute). Generally, if it could be its own control, `E` is appropriate. General guideline is allow `EA` but lean towards implementing as an element when it's stand-alone and as an attribute when it enhances its existing DOM element.
 
-    *Why?*: It makes sense.
+    *이유는?*: It makes sense.
 
-    *Why?*: While we can allow the directive to be used as a class, if the directive is truly acting as an element it makes more sense as an element or at least as an attribute.
+    *이유는?*: While we can allow the directive to be used as a class, if the directive is truly acting as an element it makes more sense as an element or at least as an attribute.
 
     Note: EA is the default for Angular 1.3 +
 
@@ -1146,7 +1170,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   angular
       .module('app.widgets')
       .directive('myCalendarRange', myCalendarRange);
@@ -1172,7 +1196,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   angular
       .module('app.widgets')
       .directive('myCalendarRange', myCalendarRange);
@@ -1196,7 +1220,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use `controller as` syntax with a directive to be consistent with using `controller as` with view and controller pairings.
 
-    *Why?*: It makes sense and it's not difficult.
+    *이유는?*: It makes sense and it's not difficult.
 
     Note: The directive below demonstrates some of the ways you can use scope inside of link and directive controllers, using controllerAs. I in-lined the template just to keep it all in one place.
 
@@ -1274,7 +1298,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use `bindToController = true` when using `controller as` syntax with a directive when you want to bind the outer scope to the directive's controller's scope.
 
-    *Why?*: It makes it easy to bind outer scope to the directive's controller scope.
+    *이유는?*: It makes it easy to bind outer scope to the directive's controller scope.
 
     Note: `bindToController` was introduced in Angular 1.3.0.
 
@@ -1325,14 +1349,14 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Resolve start-up logic for a controller in an `activate` function.
 
-    *Why?*: Placing start-up logic in a consistent place in the controller makes it easier to locate, more consistent to test, and helps avoid spreading out the activation logic across the controller.
+    *이유는?*: Placing start-up logic in a consistent place in the controller makes it easier to locate, more consistent to test, and helps avoid spreading out the activation logic across the controller.
 
-    *Why?*: The controller `activate` makes it convenient to re-use the logic for a refresh for the controller/View, keeps the logic together, gets the user to the View faster, makes animations easy on the `ng-view` or `ui-view`, and feels snappier to the user.
+    *이유는?*: The controller `activate` makes it convenient to re-use the logic for a refresh for the controller/View, keeps the logic together, gets the user to the View faster, makes animations easy on the `ng-view` or `ui-view`, and feels snappier to the user.
 
     Note: If you need to conditionally cancel the route before you start using the controller, use a [route resolve](#style-y081) instead.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   function Avengers(dataservice) {
       var vm = this;
       vm.avengers = [];
@@ -1346,7 +1370,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
   ```
 
   ```javascript
-  /* recommended */
+  /* 추천 */
   function Avengers(dataservice) {
       var vm = this;
       vm.avengers = [];
@@ -1372,14 +1396,14 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use a route resolve when you want to decide to cancel the route before ever transitioning to the View.
 
-    *Why?*: A controller may require data before it loads. That data may come from a promise via a custom factory or [$http](https://docs.angularjs.org/api/ng/service/$http). Using a [route resolve](https://docs.angularjs.org/api/ngRoute/provider/$routeProvider) allows the promise to resolve before the controller logic executes, so it might take action based on that data from the promise.
+    *이유는?*: A controller may require data before it loads. That data may come from a promise via a custom factory or [$http](https://docs.angularjs.org/api/ng/service/$http). Using a [route resolve](https://docs.angularjs.org/api/ngRoute/provider/$routeProvider) allows the promise to resolve before the controller logic executes, so it might take action based on that data from the promise.
 
-    *Why?*: The code executes after the route and in the controller’s activate function. The View starts to load right away. Data binding kicks in when the activate promise resolves. A “busy” animation can be shown during the view transition (via `ng-view` or `ui-view`)
+    *이유는?*: The code executes after the route and in the controller’s activate function. The View starts to load right away. Data binding kicks in when the activate promise resolves. A “busy” animation can be shown during the view transition (via `ng-view` or `ui-view`)
 
     Note: The code executes before the route via a promise. Rejecting the promise cancels the route. Resolve makes the new view wait for the route to resolve. A “busy” animation can be shown before the resolve and through the view transition. If you want to get to the View faster and do not require a checkpoint to decide if you can get to the View, consider the [controller `activate` technique](#style-y080) instead.
 
   ```javascript
-  /* avoid */
+  /* 비추천 */
   angular
       .module('app')
       .controller('Avengers', Avengers);
@@ -1477,10 +1501,10 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Avoid using the shortcut syntax of declaring dependencies without using a minification-safe approach.
 
-    *Why?*: The parameters to the component (e.g. controller, factory, etc) will be converted to mangled variables. For example, `common` and `dataservice` may become `a` or `b` and not be found by Angular.
+    *이유는?*: The parameters to the component (e.g. controller, factory, etc) will be converted to mangled variables. For example, `common` and `dataservice` may become `a` or `b` and not be found by Angular.
 
     ```javascript
-    /* avoid - not minification-safe*/
+    /* 비추천 - not minification-safe*/
     angular
         .module('app')
         .controller('Dashboard', Dashboard);
@@ -1492,7 +1516,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
     This code may produce mangled variables when minified and thus cause runtime errors.
 
     ```javascript
-    /* avoid - not minification-safe*/
+    /* 비추천 - not minification-safe*/
     angular.module('app').controller('Dashboard', d);function d(a, b) { }
     ```
 
@@ -1501,14 +1525,14 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use `$inject` to manually identify your dependencies for Angular components.
 
-    *Why?*: This technique mirrors the technique used by [`ng-annotate`](https://github.com/olov/ng-annotate), which I recommend for automating the creation of minification safe dependencies. If `ng-annotate` detects injection has already been made, it will not duplicate it.
+    *이유는?*: This technique mirrors the technique used by [`ng-annotate`](https://github.com/olov/ng-annotate), which I recommend for automating the creation of minification safe dependencies. If `ng-annotate` detects injection has already been made, it will not duplicate it.
 
-    *Why?*: This safeguards your dependencies from being vulnerable to minification issues when parameters may be mangled. For example, `common` and `dataservice` may become `a` or `b` and not be found by Angular.
+    *이유는?*: This safeguards your dependencies from being vulnerable to minification issues when parameters may be mangled. For example, `common` and `dataservice` may become `a` or `b` and not be found by Angular.
 
-    *Why?*: Avoid creating in-line dependencies as long lists can be difficult to read in the array. Also it can be confusing that the array is a series of strings while the last item is the component's function.
+    *이유는?*: Avoid creating in-line dependencies as long lists can be difficult to read in the array. Also it can be confusing that the array is a series of strings while the last item is the component's function.
 
     ```javascript
-    /* avoid */
+    /* 비추천 */
     angular
         .module('app')
         .controller('Dashboard',
@@ -1518,7 +1542,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
     ```
 
     ```javascript
-    /* avoid */
+    /* 비추천 */
     angular
       .module('app')
       .controller('Dashboard',
@@ -1529,7 +1553,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
     ```
 
     ```javascript
-    /* recommended */
+    /* 추천 */
     angular
         .module('app')
         .controller('Dashboard', Dashboard);
@@ -1543,7 +1567,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
     Note: When your function is below a return statement the `$inject` may be unreachable (this may happen in a directive). You can solve this by moving the Controller outside of the directive.
 
     ```javascript
-    /* avoid */
+    /* 비추천 */
     // inside a directive definition
     function outer() {
         var ddo = {
@@ -1559,7 +1583,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
     ```
 
     ```javascript
-    /* recommended */
+    /* 추천 */
     // outside a directive definition
     function outer() {
         var ddo = {
@@ -1579,12 +1603,12 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use `$inject` to manually identify your route resolver dependencies for Angular components.
 
-    *Why?*: This technique breaks out the anonymous function for the route resolver, making it easier to read.
+    *이유는?*: This technique breaks out the anonymous function for the route resolver, making it easier to read.
 
-    *Why?*: An `$inject` statement can easily precede the resolver to handle making any dependencies minification safe.
+    *이유는?*: An `$inject` statement can easily precede the resolver to handle making any dependencies minification safe.
 
     ```javascript
-    /* recommended */
+    /* 추천 */
     function config($routeProvider) {
         $routeProvider
             .when('/avengers', {
@@ -1612,9 +1636,9 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use [ng-annotate](//github.com/olov/ng-annotate) for [Gulp](http://gulpjs.com) or [Grunt](http://gruntjs.com) and comment functions that need automated dependency injection using `/** @ngInject */`
 
-    *Why?*: This safeguards your code from any dependencies that may not be using minification-safe practices.
+    *이유는?*: This safeguards your code from any dependencies that may not be using minification-safe practices.
 
-    *Why?*: [`ng-min`](https://github.com/btford/ngmin) is deprecated
+    *이유는?*: [`ng-min`](https://github.com/btford/ngmin) is deprecated
 
     >I prefer Gulp as I feel it is easier to write, to read, and to debug.
 
@@ -1689,7 +1713,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use [gulp-ng-annotate](https://www.npmjs.org/package/gulp-ng-annotate) or [grunt-ng-annotate](https://www.npmjs.org/package/grunt-ng-annotate) in an automated build task. Inject `/* @ngInject */` prior to any function that has dependencies.
 
-    *Why?*: ng-annotate will catch most dependencies, but it sometimes requires hints using the `/* @ngInject */` syntax.
+    *이유는?*: ng-annotate will catch most dependencies, but it sometimes requires hints using the `/* @ngInject */` syntax.
 
     The following code is an example of a gulp task using ngAnnotate
 
@@ -1724,12 +1748,12 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use a [decorator](https://docs.angularjs.org/api/auto/service/$provide#decorator), at config time using the [`$provide`](https://docs.angularjs.org/api/auto/service/$provide) service, on the [`$exceptionHandler`](https://docs.angularjs.org/api/ng/service/$exceptionHandler) service to perform custom actions when exceptions occur.
 
-    *Why?*: Provides a consistent way to handle uncaught Angular exceptions for development-time or run-time.
+    *이유는?*: Provides a consistent way to handle uncaught Angular exceptions for development-time or run-time.
 
     Note: Another option is to override the service instead of using a decorator. This is a fine option, but if you want to keep the default behavior and extend it a decorator is recommended.
 
     ```javascript
-    /* recommended */
+    /* 추천 */
     angular
         .module('blocks.exception')
         .config(exceptionConfig);
@@ -1765,12 +1789,12 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Create a factory that exposes an interface to catch and gracefully handle exceptions.
 
-    *Why?*: Provides a consistent way to catch exceptions that may be thrown in your code (e.g. during XHR calls or promise failures).
+    *이유는?*: Provides a consistent way to catch exceptions that may be thrown in your code (e.g. during XHR calls or promise failures).
 
     Note: The exception catcher is good for catching and reacting to specific exceptions from calls that you know may throw one. For example, when making an XHR call to retrieve data from a remote web service and you want to catch any exceptions from that service and react uniquely.
 
     ```javascript
-    /* recommended */
+    /* 추천 */
     angular
         .module('blocks.exception')
         .factory('exception', exception);
@@ -1796,12 +1820,12 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Handle and log all routing errors using [`$routeChangeError`](https://docs.angularjs.org/api/ngRoute/service/$route#$routeChangeError).
 
-    *Why?*: Provides a consistent way to handle all routing errors.
+    *이유는?*: Provides a consistent way to handle all routing errors.
 
-    *Why?*: Potentially provides a better user experience if a routing error occurs and you route them to a friendly screen with more details or recovery options.
+    *이유는?*: Potentially provides a better user experience if a routing error occurs and you route them to a friendly screen with more details or recovery options.
 
     ```javascript
-    /* recommended */
+    /* 추천 */
     var handlingRouteChangeError = false;
 
     function handleRoutingErrors() {
@@ -1847,18 +1871,18 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
     * the file name (`avengers.controller.js`)
     * the registered component name with Angular (`AvengersController`)
 
-    *Why?*: Naming conventions help provide a consistent way to find content at a glance. Consistency within the project is vital. Consistency with a team is important. Consistency across a company provides tremendous efficiency.
+    *이유는?*: Naming conventions help provide a consistent way to find content at a glance. Consistency within the project is vital. Consistency with a team is important. Consistency across a company provides tremendous efficiency.
 
-    *Why?*: The naming conventions should simply help you find your code faster and make it easier to understand.
+    *이유는?*: The naming conventions should simply help you find your code faster and make it easier to understand.
 
 ### Feature File Names
 ###### [Style [Y121](#style-y121)]
 
   - Use consistent names for all components following a pattern that describes the component's feature then (optionally) its type. My recommended pattern is `feature.type.js`.
 
-    *Why?*: Provides a consistent way to quickly identify components.
+    *이유는?*: Provides a consistent way to quickly identify components.
 
-    *Why?*: Provides pattern matching for any automated tasks.
+    *이유는?*: Provides pattern matching for any automated tasks.
 
     ```javascript
     /**
@@ -1923,9 +1947,9 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Name test specifications similar to the component they test with a suffix of `spec`.
 
-    *Why?*: Provides a consistent way to quickly identify components.
+    *이유는?*: Provides a consistent way to quickly identify components.
 
-    *Why?*: Provides pattern matching for [karma](http://karma-runner.github.io/) or other test runners.
+    *이유는?*: Provides pattern matching for [karma](http://karma-runner.github.io/) or other test runners.
 
     ```javascript
     /**
@@ -1942,9 +1966,9 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use consistent names for all controllers named after their feature. Use UpperCamelCase for controllers, as they are constructors.
 
-    *Why?*: Provides a consistent way to quickly identify and reference controllers.
+    *이유는?*: Provides a consistent way to quickly identify and reference controllers.
 
-    *Why?*: UpperCamelCase is conventional for identifying object that can be instantiated using a constructor.
+    *이유는?*: UpperCamelCase is conventional for identifying object that can be instantiated using a constructor.
 
     ```javascript
     /**
@@ -1964,7 +1988,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Append the controller name with the suffix `Controller`.
 
-    *Why?*: The `Controller` suffix is more commonly used and is more explicitly descriptive.
+    *이유는?*: The `Controller` suffix is more commonly used and is more explicitly descriptive.
 
     ```javascript
     /**
@@ -1984,13 +2008,13 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use consistent names for all factories and services named after their feature. Use camel-casing for services and factories. Avoid prefixing factories and services with `$`. Only suffix service and factories with `Service` when it is not clear what they are (i.e. when they are nouns).
 
-    *Why?*: Provides a consistent way to quickly identify and reference factories.
+    *이유는?*: Provides a consistent way to quickly identify and reference factories.
 
-    *Why?*: Avoids name collisions with built-in factories and services that use the `$` prefix.
+    *이유는?*: Avoids name collisions with built-in factories and services that use the `$` prefix.
 
-    *Why?*: Clear service names such as `logger` do not require a suffix.
+    *이유는?*: Clear service names such as `logger` do not require a suffix.
 
-    *Why?*: Service names such as `avengers` are nouns and require a suffix and should be named `avengersService`.
+    *이유는?*: Service names such as `avengers` are nouns and require a suffix and should be named `avengersService`.
 
     ```javascript
     /**
@@ -2030,7 +2054,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use consistent names for all directives using camel-case. Use a short prefix to describe the area that the directives belong (some example are company prefix or project prefix).
 
-    *Why?*: Provides a consistent way to quickly identify and reference components.
+    *이유는?*: Provides a consistent way to quickly identify and reference components.
 
     ```javascript
     /**
@@ -2052,18 +2076,18 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - When there are multiple modules, the main module file is named `app.module.js` while other dependent modules are named after what they represent. For example, an admin module is named `admin.module.js`. The respective registered module names would be `app` and `admin`.
 
-    *Why?*: Provides consistency for multiple module apps, and for expanding to large applications.
+    *이유는?*: Provides consistency for multiple module apps, and for expanding to large applications.
 
-    *Why?*: Provides easy way to use task automation to load all module definitions first, then all other angular files (for bundling).
+    *이유는?*: Provides easy way to use task automation to load all module definitions first, then all other angular files (for bundling).
 
 ### Configuration
 ###### [Style [Y128](#style-y128)]
 
   - Separate configuration for a module into its own file named after the module. A configuration file for the main `app` module is named `app.config.js` (or simply `config.js`). A configuration for a module named `admin.module.js` is named `admin.config.js`.
 
-    *Why?*: Separates configuration from module definition, components, and active code.
+    *이유는?*: Separates configuration from module definition, components, and active code.
 
-    *Why?*: Provides an identifiable place to set configuration for a module.
+    *이유는?*: Provides an identifiable place to set configuration for a module.
 
 ### Routes
 ###### [Style [Y129](#style-y129)]
@@ -2078,7 +2102,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Structure your app such that you can `L`ocate your code quickly, `I`dentify the code at a glance, keep the `F`lattest structure you can, and `T`ry to stay DRY. The structure should follow these 4 basic guidelines.
 
-    *Why LIFT?*: Provides a consistent structure that scales well, is modular, and makes it easier to increase developer efficiency by finding code quickly. Another way to check your app structure is to ask yourself: How quickly can you open and work in all of the related files for a feature?
+    *이유는 LIFT?*: Provides a consistent structure that scales well, is modular, and makes it easier to increase developer efficiency by finding code quickly. Another way to check your app structure is to ask yourself: How quickly can you open and work in all of the related files for a feature?
 
     When I find my structure is not feeling comfortable, I go back and revisit these LIFT guidelines
 
@@ -2092,7 +2116,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Make locating your code intuitive, simple and fast.
 
-    *Why?*: I find this to be super important for a project. If the team cannot find the files they need to work on quickly, they will not be able to work as efficiently as possible, and the structure needs to change. You may not know the file name or where its related files are, so putting them in the most intuitive locations and near each other saves a ton of time. A descriptive folder structure can help with this.
+    *이유는?*: I find this to be super important for a project. If the team cannot find the files they need to work on quickly, they will not be able to work as efficiently as possible, and the structure needs to change. You may not know the file name or where its related files are, so putting them in the most intuitive locations and near each other saves a ton of time. A descriptive folder structure can help with this.
 
     ```
     /bower_components
@@ -2117,21 +2141,21 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - When you look at a file you should instantly know what it contains and represents.
 
-    *Why?*: You spend less time hunting and pecking for code, and become more efficient. If this means you want longer file names, then so be it. Be descriptive with file names and keeping the contents of the file to exactly 1 component. Avoid files with multiple controllers, multiple services, or a mixture. There are deviations of the 1 per file rule when I have a set of very small features that are all related to each other, they are still easily identifiable.
+    *이유는?*: You spend less time hunting and pecking for code, and become more efficient. If this means you want longer file names, then so be it. Be descriptive with file names and keeping the contents of the file to exactly 1 component. Avoid files with multiple controllers, multiple services, or a mixture. There are deviations of the 1 per file rule when I have a set of very small features that are all related to each other, they are still easily identifiable.
 
 ### Flat
 ###### [Style [Y143](#style-y143)]
 
   - Keep a flat folder structure as long as possible. When you get to 7+ files, begin considering separation.
 
-    *Why?*: Nobody wants to search 7 levels of folders to find a file. Think about menus on web sites … anything deeper than 2 should take serious consideration. In a folder structure there is no hard and fast number rule, but when a folder has 7-10 files, that may be time to create subfolders. Base it on your comfort level. Use a flatter structure until there is an obvious value (to help the rest of LIFT) in creating a new folder.
+    *이유는?*: Nobody wants to search 7 levels of folders to find a file. Think about menus on web sites … anything deeper than 2 should take serious consideration. In a folder structure there is no hard and fast number rule, but when a folder has 7-10 files, that may be time to create subfolders. Base it on your comfort level. Use a flatter structure until there is an obvious value (to help the rest of LIFT) in creating a new folder.
 
 ### T-DRY (Try to Stick to DRY)
 ###### [Style [Y144](#style-y144)]
 
   - Be DRY, but don't go nuts and sacrifice readability.
 
-    *Why?*: Being DRY is important, but not crucial if it sacrifices the others in LIFT, which is why I call it T-DRY. I don’t want to type session-view.html for a view because, well, it’s obviously a view. If it is not obvious or by convention, then I name it.
+    *이유는?*: Being DRY is important, but not crucial if it sacrifices the others in LIFT, which is why I call it T-DRY. I don’t want to type session-view.html for a view because, well, it’s obviously a view. If it is not obvious or by convention, then I name it.
 
 **[Back to top](#table-of-contents)**
 
@@ -2149,20 +2173,20 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Place components that define the overall layout of the application in a folder named `layout`. These may include a shell view and controller may act as the container for the app, navigation, menus, content areas, and other regions.
 
-    *Why?*: Organizes all layout in a single place re-used throughout the application.
+    *이유는?*: Organizes all layout in a single place re-used throughout the application.
 
 ### Folders-by-Feature Structure
 ###### [Style [Y152](#style-y152)]
 
   - Create folders named for the feature they represent. When a folder grows to contain more than 7 files, start to consider creating a folder for them. Your threshold may be different, so adjust as needed.
 
-    *Why?*: A developer can locate the code, identify what each file represents at a glance, the structure is flat as can be, and there is no repetitive nor redundant names.
+    *이유는?*: A developer can locate the code, identify what each file represents at a glance, the structure is flat as can be, and there is no repetitive nor redundant names.
 
-    *Why?*: The LIFT guidelines are all covered.
+    *이유는?*: The LIFT guidelines are all covered.
 
-    *Why?*: Helps reduce the app from becoming cluttered through organizing the content and keeping them aligned with the LIFT guidelines.
+    *이유는?*: Helps reduce the app from becoming cluttered through organizing the content and keeping them aligned with the LIFT guidelines.
 
-    *Why?*: When there are a lot of files (10+) locating them is easier with a consistent folder structures and more difficult in flat structures.
+    *이유는?*: When there are a lot of files (10+) locating them is easier with a consistent folder structures and more difficult in flat structures.
 
     ```javascript
     /**
@@ -2256,41 +2280,41 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Create small modules that encapsulate one responsibility.
 
-    *Why?*: Modular applications make it easy to plug and go as they allow the development teams to build vertical slices of the applications and roll out incrementally. This means we can plug in new features as we develop them.
+    *이유는?*: Modular applications make it easy to plug and go as they allow the development teams to build vertical slices of the applications and roll out incrementally. This means we can plug in new features as we develop them.
 
 ### Create an App Module
 ###### [Style [Y161](#style-y161)]
 
   - Create an application root module whose role is pull together all of the modules and features of your application. Name this for your application.
 
-    *Why?*: Angular encourages modularity and separation patterns. Creating an application root module whose role is to tie your other modules together provides a very straightforward way to add or remove modules from your application.
+    *이유는?*: Angular encourages modularity and separation patterns. Creating an application root module whose role is to tie your other modules together provides a very straightforward way to add or remove modules from your application.
 
 ### Keep the App Module Thin
 ###### [Style [Y162](#style-y162)]
 
   - Only put logic for pulling together the app in the application module. Leave features in their own modules.
 
-    *Why?*: Adding additional roles to the application root to get remote data, display views, or other logic not related to pulling the app together muddies the app module and make both sets of features harder to reuse or turn off.
+    *이유는?*: Adding additional roles to the application root to get remote data, display views, or other logic not related to pulling the app together muddies the app module and make both sets of features harder to reuse or turn off.
 
-    *Why?*: The app module becomes a manifest that describes which modules help define the application.
+    *이유는?*: The app module becomes a manifest that describes which modules help define the application.
 
 ### Feature Areas are Modules
 ###### [Style [Y163](#style-y163)]
 
   - Create modules that represent feature areas, such as layout, reusable and shared services, dashboards, and app specific features (e.g. customers, admin, sales).
 
-    *Why?*: Self contained modules can be added to the application with little or no friction.
+    *이유는?*: Self contained modules can be added to the application with little or no friction.
 
-    *Why?*: Sprints or iterations can focus on feature areas and turn them on at the end of the sprint or iteration.
+    *이유는?*: Sprints or iterations can focus on feature areas and turn them on at the end of the sprint or iteration.
 
-    *Why?*: Separating feature areas into modules makes it easier to test the modules in isolation and reuse code.
+    *이유는?*: Separating feature areas into modules makes it easier to test the modules in isolation and reuse code.
 
 ### Reusable Blocks are Modules
 ###### [Style [Y164](#style-y164)]
 
   - Create modules that represent reusable application blocks for common services such as exception handling, logging, diagnostics, security, and local data stashing.
 
-    *Why?*: These types of features are needed in many applications, so by keeping them separated in their own modules they can be application generic and be reused across applications.
+    *이유는?*: These types of features are needed in many applications, so by keeping them separated in their own modules they can be application generic and be reused across applications.
 
 ### Module Dependencies
 ###### [Style [Y165](#style-y165)]
@@ -2299,11 +2323,11 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
     ![Modularity and Dependencies](https://raw.githubusercontent.com/johnpapa/angular-styleguide/master/assets/modularity-1.png)
 
-    *Why?*: The main app module contains a quickly identifiable manifest of the application's features.
+    *이유는?*: The main app module contains a quickly identifiable manifest of the application's features.
 
-    *Why?*: Each feature area contains a manifest of what it depends on, so it can be pulled in as a dependency in other applications and still work.
+    *이유는?*: Each feature area contains a manifest of what it depends on, so it can be pulled in as a dependency in other applications and still work.
 
-    *Why?*: Intra-App features such as shared data services become easy to locate and share from within `app.core` (choose your favorite name for this module).
+    *이유는?*: Intra-App features such as shared data services become easy to locate and share from within `app.core` (choose your favorite name for this module).
 
     Note: This is a strategy for consistency. There are many good options here. Choose one that is consistent, follows Angular's dependency rules, and is easy to maintain and scale.
 
@@ -2320,7 +2344,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Inject code into [module configuration](https://docs.angularjs.org/guide/module#module-loading-dependencies) that must be configured before running the angular app. Ideal candidates include providers and constants.
 
-    *Why?*: This makes it easier to have less places for configuration.
+    *이유는?*: This makes it easier to have less places for configuration.
 
   ```javascript
   angular
@@ -2352,7 +2376,7 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Any code that needs to run when an application starts should be declared in a factory, exposed via a function, and injected into the [run block](https://docs.angularjs.org/guide/module#module-loading-dependencies).
 
-    *Why?*: Code directly in a run block can be difficult to test. Placing in a factory makes it easier to abstract and mock.
+    *이유는?*: Code directly in a run block can be difficult to test. Placing in a factory makes it easier to abstract and mock.
 
   ```javascript
   angular
@@ -2376,14 +2400,14 @@ While this guide explains the *what*, *why* and *how*, I find it helpful to see 
 
   - Use [`$document`](https://docs.angularjs.org/api/ng/service/$document) and [`$window`](https://docs.angularjs.org/api/ng/service/$window) instead of `document` and `window`.
 
-    *Why?*: These services are wrapped by Angular and more easily testable than using document and window in tests. This helps you avoid having to mock document and window yourself.
+    *이유는?*: These services are wrapped by Angular and more easily testable than using document and window in tests. This helps you avoid having to mock document and window yourself.
 
 ### $timeout and $interval
 ###### [Style [Y181](#style-y181)]
 
   - Use [`$timeout`](https://docs.angularjs.org/api/ng/service/$timeout) and [`$interval`](https://docs.angularjs.org/api/ng/service/$interval) instead of `setTimeout` and `setInterval` .
 
-    *Why?*: These services are wrapped by Angular and more easily testable and handle Angular's digest cycle thus keeping data binding in sync.
+    *이유는?*: These services are wrapped by Angular and more easily testable and handle Angular's digest cycle thus keeping data binding in sync.
 
 **[Back to top](#table-of-contents)**
 
@@ -2395,7 +2419,7 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Write a set of tests for every story. Start with an empty test and fill them in as you write the code for the story.
 
-    *Why?*: Writing the test descriptions helps clearly define what your story will do, will not do, and how you can measure success.
+    *이유는?*: Writing the test descriptions helps clearly define what your story will do, will not do, and how you can measure success.
 
     ```javascript
     it('should have Avengers controller', function() {
@@ -2422,7 +2446,7 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Use [Jasmine](http://jasmine.github.io/) or [Mocha](http://mochajs.org) for unit testing.
 
-    *Why?*: Both Jasmine and Mocha are widely used in the Angular community. Both are stable, well maintained, and provide robust testing features.
+    *이유는?*: Both Jasmine and Mocha are widely used in the Angular community. Both are stable, well maintained, and provide robust testing features.
 
     Note: When using Mocha, also consider choosing an assert library such as [Chai](http://chaijs.com). I prefer Mocha.
 
@@ -2431,16 +2455,16 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Use [Karma](http://karma-runner.github.io) as a test runner.
 
-    *Why?*: Karma is easy to configure to run once or automatically when you change your code.
+    *이유는?*: Karma is easy to configure to run once or automatically when you change your code.
 
-    *Why?*: Karma hooks into your Continuous Integration process easily on its own or through Grunt or Gulp.
+    *이유는?*: Karma hooks into your Continuous Integration process easily on its own or through Grunt or Gulp.
 
-    *Why?*: Some IDE's are beginning to integrate with Karma, such as [WebStorm](http://www.jetbrains.com/webstorm/) and [Visual Studio](http://visualstudiogallery.msdn.microsoft.com/02f47876-0e7a-4f6c-93f8-1af5d5189225).
+    *이유는?*: Some IDE's are beginning to integrate with Karma, such as [WebStorm](http://www.jetbrains.com/webstorm/) and [Visual Studio](http://visualstudiogallery.msdn.microsoft.com/02f47876-0e7a-4f6c-93f8-1af5d5189225).
 
-    *Why?*: Karma works well with task automation leaders such as [Grunt](http://www.gruntjs.com) (with [grunt-karma](https://github.com/karma-runner/grunt-karma)) and [Gulp](http://www.gulpjs.com). When using Gulp, use [Karma](https://github.com/karma-runner/karma) directly and not with a plugin as the API can be called directly.
+    *이유는?*: Karma works well with task automation leaders such as [Grunt](http://www.gruntjs.com) (with [grunt-karma](https://github.com/karma-runner/grunt-karma)) and [Gulp](http://www.gulpjs.com). When using Gulp, use [Karma](https://github.com/karma-runner/karma) directly and not with a plugin as the API can be called directly.
 
     ```javascript
-    /* recommended */
+    /* 추천 */
 
     // Gulp example with Karma directly
     function startTests(singleRun, done) {
@@ -2490,18 +2514,18 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Use [Sinon](http://sinonjs.org/) for stubbing and spying.
 
-    *Why?*: Sinon works well with both Jasmine and Mocha and extends the stubbing and spying features they offer.
+    *이유는?*: Sinon works well with both Jasmine and Mocha and extends the stubbing and spying features they offer.
 
-    *Why?*: Sinon makes it easier to toggle between Jasmine and Mocha, if you want to try both.
+    *이유는?*: Sinon makes it easier to toggle between Jasmine and Mocha, if you want to try both.
 
-    *Why?*: Sinon has descriptive messages when tests fail the assertions.
+    *이유는?*: Sinon has descriptive messages when tests fail the assertions.
 
 ### Headless Browser
 ###### [Style [Y194](#style-y194)]
 
   - Use [PhantomJS](http://phantomjs.org/) to run your tests on a server.
 
-    *Why?*: PhantomJS is a headless browser that helps run your tests without needing a "visual" browser. So you do not have to install Chrome, Safari, IE, or other browsers on your server.
+    *이유는?*: PhantomJS is a headless browser that helps run your tests without needing a "visual" browser. So you do not have to install Chrome, Safari, IE, or other browsers on your server.
 
     Note: You should still test on all browsers in your environment, as appropriate for your target audience.
 
@@ -2510,14 +2534,14 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Run JSHint on your tests.
 
-    *Why?*: Tests are code. JSHint can help identify code quality issues that may cause the test to work improperly.
+    *이유는?*: Tests are code. JSHint can help identify code quality issues that may cause the test to work improperly.
 
 ### Alleviate Globals for JSHint Rules on Tests
 ###### [Style [Y196](#style-y196)]
 
   - Relax the rules on your test code to allow for common globals such as `describe` and `expect`. Relax the rules for expressions, as Mocha uses these.
 
-    *Why?*: Your tests are code and require the same attention and code quality rules as all of your production code. However, global variables used by the testing framework, for example, can be relaxed by including this in your test specs.
+    *이유는?*: Your tests are code and require the same attention and code quality rules as all of your production code. However, global variables used by the testing framework, for example, can be relaxed by including this in your test specs.
 
     ```javascript
     /* jshint -W117, -W030 */
@@ -2536,17 +2560,17 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Place unit test files (specs) side-by-side with your client code. Place specs that cover server integration or test multiple components in a separate `tests` folder.
 
-    *Why?*: Unit tests have a direct correlation to a specific component and file in source code.
+    *이유는?*: Unit tests have a direct correlation to a specific component and file in source code.
 
-    *Why?*: It is easier to keep them up to date since they are always in sight. When coding whether you do TDD or test during development or test after development, the specs are side-by-side and never out of sight nor mind, and thus more likely to be maintained which also helps maintain code coverage.
+    *이유는?*: It is easier to keep them up to date since they are always in sight. When coding whether you do TDD or test during development or test after development, the specs are side-by-side and never out of sight nor mind, and thus more likely to be maintained which also helps maintain code coverage.
 
-    *Why?*: When you update source code it is easier to go update the tests at the same time.
+    *이유는?*: When you update source code it is easier to go update the tests at the same time.
 
-    *Why?*: Placing them side-by-side makes it easy to find them and easy to move them with the source code if you move the source.
+    *이유는?*: Placing them side-by-side makes it easy to find them and easy to move them with the source code if you move the source.
 
-    *Why?*: Having the spec nearby makes it easier for the source code reader to learn how the component is supposed to be used and to discover its known limitations.
+    *이유는?*: Having the spec nearby makes it easier for the source code reader to learn how the component is supposed to be used and to discover its known limitations.
 
-    *Why?*: Separating specs so they are not in a distributed build is easy with grunt or gulp.
+    *이유는?*: Separating specs so they are not in a distributed build is easy with grunt or gulp.
 
     ```
     /src/client/app/customers/customer-detail.controller.js
@@ -2567,27 +2591,27 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Use subtle [animations with Angular](https://docs.angularjs.org/guide/animations) to transition between states for views and primary visual elements. Include the [ngAnimate module](https://docs.angularjs.org/api/ngAnimate). The 3 keys are subtle, smooth, seamless.
 
-    *Why?*: Subtle animations can improve User Experience when used appropriately.
+    *이유는?*: Subtle animations can improve User Experience when used appropriately.
 
-    *Why?*: Subtle animations can improve perceived performance as views transition.
+    *이유는?*: Subtle animations can improve perceived performance as views transition.
 
 ### Sub Second
 ###### [Style [Y211](#style-y211)]
 
   - Use short durations for animations. I generally start with 300ms and adjust until appropriate.
 
-    *Why?*: Long animations can have the reverse affect on User Experience and perceived performance by giving the appearance of a slow application.
+    *이유는?*: Long animations can have the reverse affect on User Experience and perceived performance by giving the appearance of a slow application.
 
 ### animate.css
 ###### [Style [Y212](#style-y212)]
 
   - Use [animate.css](http://daneden.github.io/animate.css/) for conventional animations.
 
-    *Why?*: The animations that animate.css provides are fast, smooth, and easy to add to your application.
+    *이유는?*: The animations that animate.css provides are fast, smooth, and easy to add to your application.
 
-    *Why?*: Provides consistency in your animations.
+    *이유는?*: Provides consistency in your animations.
 
-    *Why?*: animate.css is widely used and tested.
+    *이유는?*: animate.css is widely used and tested.
 
     Note: See this [great post by Matias Niemelä on Angular animations](http://www.yearofmoo.com/2013/08/remastered-animation-in-angularjs-1-2.html)
 
@@ -2600,9 +2624,9 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - If planning to produce documentation, use [`jsDoc`](http://usejsdoc.org/) syntax to document function names, description, params and returns. Use `@namespace` and `@memberOf` to match your app structure.
 
-    *Why?*: You can generate (and regenerate) documentation from your code, instead of writing it from scratch.
+    *이유는?*: You can generate (and regenerate) documentation from your code, instead of writing it from scratch.
 
-    *Why?*: Provides consistency using a common industry tool.
+    *이유는?*: Provides consistency using a common industry tool.
 
     ```javascript
     /**
@@ -2652,9 +2676,9 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Use JS Hint for linting your JavaScript and be sure to customize the JS Hint options file and include in source control. See the [JS Hint docs](http://www.jshint.com/docs/) for details on the options.
 
-    *Why?*: Provides a first alert prior to committing any code to source control.
+    *이유는?*: Provides a first alert prior to committing any code to source control.
 
-    *Why?*: Provides consistency across your team.
+    *이유는?*: Provides consistency across your team.
 
     ```javascript
     {
@@ -2729,9 +2753,9 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Use JSCS for checking your coding styles your JavaScript and be sure to customize the JSCS options file and include in source control. See the [JSCS docs](http://www.jscs.info) for details on the options.
 
-    *Why?*: Provides a first alert prior to committing any code to source control.
+    *이유는?*: Provides a first alert prior to committing any code to source control.
 
-    *Why?*: Provides consistency across your team.
+    *이유는?*: Provides consistency across your team.
 
     ```javascript
     {
@@ -2819,7 +2843,7 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Create an Angular Constant for vendor libraries' global variables.
 
-    *Why?*: Provides a way to inject vendor libraries that otherwise are globals. This improves code testability by allowing you to more easily know what the dependencies of your components are (avoids leaky abstractions). It also allows you to mock these dependencies, where it makes sense.
+    *이유는?*: Provides a way to inject vendor libraries that otherwise are globals. This improves code testability by allowing you to more easily know what the dependencies of your components are (avoids leaky abstractions). It also allows you to mock these dependencies, where it makes sense.
 
     ```javascript
     // constants.js
@@ -2839,11 +2863,11 @@ Unit testing helps maintain clean code, as such I included some of my recommenda
 
   - Use constants for values that do not change and do not come from another service. When constants are used only for a module that may be reused in multiple applications, place constants in a file per module named after the module. Until this is required, keep constants in the main module in a `constants.js` file.
 
-    *Why?*: A value that may change, even infrequently, should be retrieved from a service so you do not have to change the source code. For example, a url for a data service could be placed in a constants but a better place would be to load it from a web service.
+    *이유는?*: A value that may change, even infrequently, should be retrieved from a service so you do not have to change the source code. For example, a url for a data service could be placed in a constants but a better place would be to load it from a web service.
 
-    *Why?*: Constants can be injected into any angular component, including providers.
+    *이유는?*: Constants can be injected into any angular component, including providers.
 
-    *Why?*: When an application is separated into modules that may be reused in other applications, each stand-alone module should be able to operate on its own including any dependent constants.
+    *이유는?*: When an application is separated into modules that may be reused in other applications, each stand-alone module should be able to operate on its own including any dependent constants.
 
     ```javascript
     // Constants used by the entire app
@@ -3019,9 +3043,9 @@ Client-side routing is important for creating a navigation flow between views an
 
   - Use the [AngularUI Router](http://angular-ui.github.io/ui-router/) for client-side routing.
 
-    *Why?*: UI Router offers all the features of the Angular router plus a few additional ones including nested routes and states.
+    *이유는?*: UI Router offers all the features of the Angular router plus a few additional ones including nested routes and states.
 
-    *Why?*: The syntax is quite similar to the Angular router and is easy to migrate to UI Router.
+    *이유는?*: The syntax is quite similar to the Angular router and is easy to migrate to UI Router.
 
   - Note: You can use a provider such as the `routerHelperProvider` shown below to help configure states across files, during the run phase.
 
@@ -3097,11 +3121,11 @@ Client-side routing is important for creating a navigation flow between views an
 
   - Define routes for views in the module where they exist. Each module should contain the routes for the views in the module.
 
-    *Why?*: Each module should be able to stand on its own.
+    *이유는?*: Each module should be able to stand on its own.
 
-    *Why?*: When removing a module or adding a module, the app will only contain routes that point to existing views.
+    *이유는?*: When removing a module or adding a module, the app will only contain routes that point to existing views.
 
-    *Why?*: This makes it easy to enable or disable portions of an application without concern over orphaned routes.
+    *이유는?*: This makes it easy to enable or disable portions of an application without concern over orphaned routes.
 
 **[Back to top](#table-of-contents)**
 
@@ -3114,9 +3138,9 @@ Use [Gulp](http://gulpjs.com) or [Grunt](http://gruntjs.com) for creating automa
 
   - Use task automation to list module definition files `*.module.js` before all other application JavaScript files.
 
-    *Why?*: Angular needs the module definitions to be registered before they are used.
+    *이유는?*: Angular needs the module definitions to be registered before they are used.
 
-    *Why?*: Naming modules with a specific pattern such as `*.module.js` makes it easy to grab them with a glob and list them first.
+    *이유는?*: Naming modules with a specific pattern such as `*.module.js` makes it easy to grab them with a glob and list them first.
 
     ```javascript
     var clientApp = './src/client/app/';
@@ -3136,7 +3160,7 @@ Use [Gulp](http://gulpjs.com) or [Grunt](http://gruntjs.com) for creating automa
 
   - Avoid using filters for scanning all properties of a complex object graph. Use filters for select properties.
 
-    *Why?*: Filters can easily be abused and negatively affect performance if not used wisely, for example when a filter hits a large and deep object graph.
+    *이유는?*: Filters can easily be abused and negatively affect performance if not used wisely, for example when a filter hits a large and deep object graph.
 
 **[Back to top](#table-of-contents)**
 
