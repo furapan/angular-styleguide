@@ -420,15 +420,15 @@ While this guide explains the *what*, *이유는* and *how*, I find it helpful t
   }
   ```
 
-### Bindable Members Up Top
+### 바인딩될 멤버들을 최상단에 두기
 ###### [Style [Y033](#style-y033)]
 
   - Place bindable members at the top of the controller, alphabetized, and not spread through the controller code.
+  - 바인딩할 멤버들을 컨트롤러 여기저기에 뿌려놓지 말고 최상단에 알파벳 순으로 관리하라.
 
-    *이유는?*: Placing bindable members at the top makes it easy to read and helps you instantly identify which members of the controller can be bound and used in the View.
-
-    *이유는?*: Setting anonymous functions in-line can be easy, but when those functions are more than 1 line of code they can reduce the readability. Defining the functions below the bindable members (the functions will be hoisted) moves the implementation details down, keeps the bindable members up top, and makes it easier to read.
-
+    *이유는?*: 최상단에 바인딩 될 멤버들을 두는 것은 코드 가독성을 높이고 컨트롤러에서 뷰에 바인딩 될 수 있는 멤버들을 한눈에 파악할 수 있게 한다.
+    *이유는?*: 변수에 익명함수를 곧바로 선언하는 것은 간편하다. 그러나 이런 함수가 1줄 이상의 코드일 경우 가독성을 해친다. 함수를 바인딩될 멤버들 아래에 정의하면 (함수는 호이스팅 될 것이다) 세부적인 구현은 아래로 이동하고 바인딩될 멤버들은 최상단에 유지하게 되어 읽기 쉬운 코드가 된다.
+    
   ```javascript
   /* 비추천 */
   function Sessions() {
@@ -475,7 +475,7 @@ While this guide explains the *what*, *이유는* and *how*, I find it helpful t
 
     ![Controller Using "Above the Fold"](https://raw.githubusercontent.com/johnpapa/angular-styleguide/master/assets/above-the-fold-1.png)
 
-  Note: If the function is a 1 liner consider keeping it right up top, as long as readability is not affected.
+  Note: 한 줄 짜리 함수라면 가독성을 해치지 않는 한 상단에 유지하는 것을 고려하라.
 
   ```javascript
   /* 비추천 */
@@ -485,11 +485,11 @@ While this guide explains the *what*, *이유는* and *how*, I find it helpful t
       vm.gotoSession = gotoSession;
       vm.refresh = function() {
           /**
-           * lines
-           * of
-           * code
-           * affects
-           * readability
+           * 여러
+           * 줄의
+           * 코드는
+           * 가독성을
+           * 떨어뜨린다.
            */
       };
       vm.search = search;
